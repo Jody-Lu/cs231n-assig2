@@ -153,8 +153,8 @@ def batchnorm_forward(x, gamma, beta, bn_param):
   - out: of shape (N, D)
   - cache: A tuple of values needed in the backward pass
   """
-  mode = bn_param['mode']
-  eps = bn_param.get('eps', 1e-5)
+  mode     = bn_param['mode']
+  eps      = bn_param.get('eps', 1e-5)
   momentum = bn_param.get('momentum', 0.9)
 
   N, D = x.shape
@@ -185,16 +185,11 @@ def batchnorm_forward(x, gamma, beta, bn_param):
     xhat = xmu * ivar
     gammax = gamma * xhat
     out = gammax + beta
-    cache = (xhat,gamma,xmu,ivar,sqrtvar,var,eps)
+    cache = (xhat, gamma, xmu, ivar, sqrtvar, var, eps)
 
     running_mean = momentum * running_mean + (1 - momentum) * mu
     running_var = momentum * running_var + (1 - momentum) * var
 
-    #sample_mean = np.mean(x, axis = 0) # (D, )
-    #sample_var = np.var(x, axis = 0)   # (D, )
-    #running_mean = momentum * running_mean + (1 - momentum) * sample_mean
-    #running_var = momentum * running_var + (1 - momentum) * sample_var
-    #out = (x - sample_mean) * gamma / np.sqrt(sample_var + eps) + beta
     #############################################################################
     #                             END OF YOUR CODE                              #
     #############################################################################
@@ -586,7 +581,7 @@ def max_pool_backward_naive(dout, cache):
 def spatial_batchnorm_forward(x, gamma, beta, bn_param):
   """
   Computes the forward pass for spatial batch normalization.
-  
+
   Inputs:
   - x: Input data of shape (N, C, H, W)
   - gamma: Scale parameter, of shape (C,)
@@ -600,12 +595,14 @@ def spatial_batchnorm_forward(x, gamma, beta, bn_param):
       default of momentum=0.9 should work well in most situations.
     - running_mean: Array of shape (D,) giving running mean of features
     - running_var Array of shape (D,) giving running variance of features
-    
+
   Returns a tuple of:
   - out: Output data, of shape (N, C, H, W)
   - cache: Values needed for the backward pass
   """
   out, cache = None, None
+  N, C, H, W = x.shape
+  mode         = bn_param['mode']
 
   #############################################################################
   # TODO: Implement the forward pass for spatial batch normalization.         #
@@ -614,7 +611,8 @@ def spatial_batchnorm_forward(x, gamma, beta, bn_param):
   # version of batch normalization defined above. Your implementation should  #
   # be very short; ours is less than five lines.                              #
   #############################################################################
-  pass
+  out, cache = batchnorm_forward(x.reshape(N * H * W, C), gamma, beta, bn_param)
+  out = out.reshape(N, C, H, W)
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
@@ -625,11 +623,11 @@ def spatial_batchnorm_forward(x, gamma, beta, bn_param):
 def spatial_batchnorm_backward(dout, cache):
   """
   Computes the backward pass for spatial batch normalization.
-  
+
   Inputs:
   - dout: Upstream derivatives, of shape (N, C, H, W)
   - cache: Values from the forward pass
-  
+
   Returns a tuple of:
   - dx: Gradient with respect to inputs, of shape (N, C, H, W)
   - dgamma: Gradient with respect to scale parameter, of shape (C,)
@@ -644,13 +642,13 @@ def spatial_batchnorm_backward(dout, cache):
   # version of batch normalization defined above. Your implementation should  #
   # be very short; ours is less than five lines.                              #
   #############################################################################
-  pass
+
   #############################################################################
   #                             END OF YOUR CODE                              #
   #############################################################################
 
   return dx, dgamma, dbeta
-  
+
 
 def svm_loss(x, y):
   """
