@@ -50,11 +50,13 @@ def affine_backward(dout, cache):
   - dw: Gradient with respect to w, of shape (D, M)
   - db: Gradient with respect to b, of shape (M,)
   """
-  x, w, b = cache
-  dx, dw, db = None, None, None
-
+  (x, w, b) = cache
   N = x.shape[0]
-  D, M = w.shape
+  (D, M) = w.shape
+
+  dx = np.zeros_like(x)
+  dw = np.zeros_like(w)
+  db = np.zeros_like(b)
   #############################################################################
   # TODO: Implement the affine backward pass.                                 #
   #############################################################################
@@ -337,7 +339,9 @@ def dropout_forward(x, dropout_param):
   - cache: A tuple (dropout_param, mask). In training mode, mask is the dropout
     mask that was used to multiply the input; in test mode, mask is None.
   """
-  p, mode = dropout_param['p'], dropout_param['mode']
+  p    = dropout_param['p']
+  mode = dropout_param['mode']
+
   if 'seed' in dropout_param:
     np.random.seed(dropout_param['seed'])
 
@@ -378,6 +382,7 @@ def dropout_backward(dout, cache):
   - cache: (dropout_param, mask) from dropout_forward.
   """
   dropout_param, mask = cache
+
   mode = dropout_param['mode']
 
   dx = None
@@ -417,15 +422,17 @@ def conv_forward_naive(x, w, b, conv_param):
   - cache: (x, w, b, conv_param)
   """
   out = None
-  stride, pad = conv_param['stride'], conv_param['pad']
+  stride = conv_param['stride']
+  pad    = conv_param['pad']
 
-  N, C, H, W = x.shape
-  F, C, HH, WW = w.shape
+  (N, C, H, W) = x.shape
+  (F, _, HH, WW) = w.shape
+
   H_out = 1 + (H - HH + 2 * pad) / stride
   W_out = 1 + (W - WW + 2 * pad) / stride
   D_out = F
-  out = np.zeros((N, F, H_out, W_out))
 
+  out = np.zeros((N, F, H_out, W_out))
   pad_x = np.zeros((N, C, H + 2 * pad, W + 2 * pad))
   #############################################################################
   # TODO: Implement the convolutional forward pass.                           #
@@ -508,10 +515,10 @@ def max_pool_forward_naive(x, pool_param):
   - cache: (x, pool_param)
   """
 
-  N, C, H, W = x.shape
+  (N, C, H, W) = x.shape
   pool_height = pool_param['pool_height']
-  pool_width = pool_param['pool_width']
-  stride = pool_param['stride']
+  pool_width  = pool_param['pool_width']
+  stride      = pool_param['stride']
 
   H_out = 1 + (H - pool_height) / stride
   W_out = 1 + (W - pool_width) / stride
@@ -548,10 +555,11 @@ def max_pool_backward_naive(dout, cache):
   - dx: Gradient with respect to x
   """
   x, pool_param = cache
-  N, C, H, W = x.shape
+  (N, C, H, W) = x.shape
   pool_height = pool_param['pool_height']
-  pool_width = pool_param['pool_width']
-  stride = pool_param['stride']
+  pool_width  = pool_param['pool_width']
+  stride      = pool_param['stride']
+
   H_prime = 1 + (H - pool_height) / stride
   W_prime = 1 + (W - pool_width) / stride
 
@@ -601,8 +609,7 @@ def spatial_batchnorm_forward(x, gamma, beta, bn_param):
   - cache: Values needed for the backward pass
   """
   out, cache = None, None
-  N, C, H, W = x.shape
-  mode         = bn_param['mode']
+  (N, C, H, W) = x.shape
 
   #############################################################################
   # TODO: Implement the forward pass for spatial batch normalization.         #
